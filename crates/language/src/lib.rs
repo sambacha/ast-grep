@@ -24,6 +24,8 @@ mod python;
 mod ruby;
 mod rust;
 mod scala;
+
+mod solidity;
 mod swift;
 mod yaml;
 
@@ -179,6 +181,7 @@ impl_lang_expando!(Ruby, language_ruby, 'µ');
 // https://doc.rust-lang.org/reference/identifiers.html
 impl_lang_expando!(Rust, language_rust, 'µ');
 impl_lang_expando!(Sql, language_sql, '_');
+impl_lang_expando!(Solidity, language_solidity, 'µ');
 //https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure/#Identifiers
 impl_lang_expando!(Swift, language_swift, 'µ');
 
@@ -220,6 +223,7 @@ pub enum SupportLang {
   Rust,
   Scala,
   Sql,
+  Solidity,
   Swift,
   Tsx,
   TypeScript,
@@ -231,7 +235,7 @@ impl SupportLang {
     use SupportLang::*;
     &[
       Bash, C, Cpp, CSharp, Css, Elixir, Go, Haskell, Html, Java, JavaScript, Json, Kotlin, Lua,
-      Php, Python, Ruby, Rust, Scala, Sql, Swift, Tsx, TypeScript, Yaml,
+      Php, Python, Ruby, Rust, Scala, Sql, Solidity, Swift, Tsx, TypeScript, Yaml,
     ]
   }
 
@@ -332,6 +336,7 @@ impl_aliases! {
   Rust => &["rs", "rust"],
   Scala => &["scala"],
   Sql => &["sql"],
+  Solidity => &["solidity"],
   Swift => &["swift"],
   TypeScript => &["ts", "typescript"],
   Tsx => &["tsx"],
@@ -377,6 +382,7 @@ macro_rules! execute_lang_method {
       S::Rust => Rust.$method($($pname,)*),
       S::Scala => Scala.$method($($pname,)*),
       S::Sql => Sql.$method($($pname,)*),
+      S::Solidity => Solidity.$method($($pname,)*),
       S::Swift => Swift.$method($($pname,)*),
       S::Tsx => Tsx.$method($($pname,)*),
       S::TypeScript => TypeScript.$method($($pname,)*),
@@ -442,6 +448,7 @@ fn extensions(lang: SupportLang) -> &'static [&'static str] {
     Rust => &["rs"],
     Scala => &["scala", "sc", "sbt"],
     Sql => &["sql", "pgsql"],
+    Solidity => &["solidity", "sol"],
     Swift => &["swift"],
     TypeScript => &["ts", "cts", "mts"],
     Tsx => &["tsx"],
