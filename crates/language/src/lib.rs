@@ -181,7 +181,6 @@ impl_lang_expando!(Ruby, language_ruby, 'µ');
 // https://doc.rust-lang.org/reference/identifiers.html
 impl_lang_expando!(Rust, language_rust, 'µ');
 impl_lang_expando!(Sql, language_sql, '_');
-impl_lang_expando!(Solidity, language_solidity, 'µ');
 //https://docs.swift.org/swift-book/documentation/the-swift-programming-language/lexicalstructure/#Identifiers
 impl_lang_expando!(Swift, language_swift, 'µ');
 
@@ -194,6 +193,7 @@ impl_lang!(Json, language_json);
 impl_lang!(Lua, language_lua);
 impl_lang!(Php, language_php);
 impl_lang!(Scala, language_scala);
+impl_lang!(Solidity, language_solidity); // Solidity already accepts '$' as part of an identifier, so no need to patch the identifier rule
 impl_lang!(Tsx, language_tsx);
 impl_lang!(TypeScript, language_typescript);
 impl_lang!(Yaml, language_yaml);
@@ -336,7 +336,7 @@ impl_aliases! {
   Rust => &["rs", "rust"],
   Scala => &["scala"],
   Sql => &["sql"],
-  Solidity => &["solidity"],
+  Solidity => &["solidity", "sol"],
   Swift => &["swift"],
   TypeScript => &["ts", "typescript"],
   Tsx => &["tsx"],
@@ -520,6 +520,13 @@ mod test {
     );
   }
 
+  /// Replaces a pattern in the given source code with a replacer string for the specified language.
+  ///
+  /// This function takes a source code string, a pattern to match, a replacer string, and a language
+  /// implementation. It uses the language's `ast_grep` and `pre_process_pattern` methods to parse the
+  /// source and replacer, and then replaces the pattern in the source with the preprocessed replacer.
+  /// If the replacement is successful, the function returns the modified source code as a `String`.
+  /// If there is a parsing error, the function returns a `TSParseError`.
   pub fn test_replace_lang(
     src: &str,
     pattern: &str,
