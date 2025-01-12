@@ -24,6 +24,8 @@ mod python;
 mod ruby;
 mod rust;
 mod scala;
+
+mod solidity;
 mod swift;
 mod yaml;
 
@@ -191,6 +193,7 @@ impl_lang!(Json, language_json);
 impl_lang!(Lua, language_lua);
 impl_lang!(Php, language_php);
 impl_lang!(Scala, language_scala);
+impl_lang!(Solidity, language_solidity); // Solidity already accepts '$' as part of an identifier, so no need to patch the identifier rule
 impl_lang!(Tsx, language_tsx);
 impl_lang!(TypeScript, language_typescript);
 impl_lang!(Yaml, language_yaml);
@@ -220,6 +223,7 @@ pub enum SupportLang {
   Rust,
   Scala,
   Sql,
+  Solidity,
   Swift,
   Tsx,
   TypeScript,
@@ -231,7 +235,7 @@ impl SupportLang {
     use SupportLang::*;
     &[
       Bash, C, Cpp, CSharp, Css, Elixir, Go, Haskell, Html, Java, JavaScript, Json, Kotlin, Lua,
-      Php, Python, Ruby, Rust, Scala, Sql, Swift, Tsx, TypeScript, Yaml,
+      Php, Python, Ruby, Rust, Scala, Sql, Solidity, Swift, Tsx, TypeScript, Yaml,
     ]
   }
 
@@ -332,6 +336,7 @@ impl_aliases! {
   Rust => &["rs", "rust"],
   Scala => &["scala"],
   Sql => &["sql"],
+  Solidity => &["solidity", "sol"],
   Swift => &["swift"],
   TypeScript => &["ts", "typescript"],
   Tsx => &["tsx"],
@@ -377,6 +382,7 @@ macro_rules! execute_lang_method {
       S::Rust => Rust.$method($($pname,)*),
       S::Scala => Scala.$method($($pname,)*),
       S::Sql => Sql.$method($($pname,)*),
+      S::Solidity => Solidity.$method($($pname,)*),
       S::Swift => Swift.$method($($pname,)*),
       S::Tsx => Tsx.$method($($pname,)*),
       S::TypeScript => TypeScript.$method($($pname,)*),
@@ -442,6 +448,7 @@ fn extensions(lang: SupportLang) -> &'static [&'static str] {
     Rust => &["rs"],
     Scala => &["scala", "sc", "sbt"],
     Sql => &["sql", "pgsql"],
+    Solidity => &["solidity", "sol"],
     Swift => &["swift"],
     TypeScript => &["ts", "cts", "mts"],
     Tsx => &["tsx"],
@@ -513,6 +520,13 @@ mod test {
     );
   }
 
+  /// Replaces a pattern in the given source code with a replacer string for the specified language.
+  ///
+  /// This function takes a source code string, a pattern to match, a replacer string, and a language
+  /// implementation. It uses the language's `ast_grep` and `pre_process_pattern` methods to parse the
+  /// source and replacer, and then replaces the pattern in the source with the preprocessed replacer.
+  /// If the replacement is successful, the function returns the modified source code as a `String`.
+  /// If there is a parsing error, the function returns a `TSParseError`.
   pub fn test_replace_lang(
     src: &str,
     pattern: &str,
